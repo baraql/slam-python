@@ -1,0 +1,4 @@
+/images/*
+/videos/*
+.DS_Store
+__pycache__
