@@ -24,9 +24,14 @@ def main():
 	# 	ret, frame = cap.read()
 	folder_path = "images"
 	files = os.listdir(folder_path)
-	files.sort()
 
-	for file in files:
+	# Pad filenames with leading zeroes
+	files_padded = [f"{int(file.split('.')[0]):03d}.{file.split('.')[1]}" for file in files]
+
+	# Sort the padded filenames
+	files_sorted = sorted(files_padded)
+
+	for file in files_sorted:
 		# Check if the file is an image (assuming all files in the folder are images)
 		if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith(".png"):
 			# Read the image
@@ -34,22 +39,26 @@ def main():
 			
 			# Check if the image was successfully read
 			if image is not None:
-				frame = cv2.resize(image, (960, 540))
-				img, tripoints, kpts, matches = process(frame)
-				xyz = pmap.collect_points(tripoints)
+				try:
+					frame = cv2.resize(image, (960, 540))
+					img, tripoints, kpts, matches = process(frame)
+					
+					xyz = pmap.collect_points(tripoints)
 
-				if kpts is not None or matches is not None:
-					display.display_points2d(frame, kpts, matches)
-				else:
-					pass
-				display.display_vid(frame)
+					if kpts is not None or matches is not None:
+						display.display_points2d(frame, kpts, matches)
+					else:
+						pass
+					display.display_vid(frame)
 
-				if xyz is not None:
-					display.display_points3d(xyz, pcd, visualizer)
-				else:
-					pass
-				if cv2.waitKey(1) == 27:
-					break
+					if xyz is not None:
+						display.display_points3d(xyz, pcd, visualizer)
+					else:
+						pass
+					if cv2.waitKey(1) == 27:
+						break
+				except Error as e:
+					print(e)
 
 	cv2.destroyAllWindows()
 	# cap.release()
